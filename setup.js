@@ -50,7 +50,8 @@ for (const [source, names] of THIRD_PARTY) {
 const claudePlugins = path.join(HOME, '.claude', 'plugins', 'installed_plugins.json');
 if (!(fs.existsSync(claudePlugins) && read(claudePlugins).includes('"ponytail@ponytail"'))) {
   say('installing the ponytail plugin for Claude Code');
-  try { sh('claude', ['plugin', 'marketplace', 'add', 'DietrichGebert/ponytail']); sh('claude', ['plugin', 'install', 'ponytail@ponytail']); }
+  // HTTPS, not owner/repo: the CLI otherwise falls back to SSH, which a fresh PC may not have set up.
+  try { sh('claude', ['plugin', 'marketplace', 'add', 'https://github.com/DietrichGebert/ponytail.git']); sh('claude', ['plugin', 'install', 'ponytail@ponytail']); }
   catch { console.error('could not install ponytail; in Claude Code run: /plugin marketplace add DietrichGebert/ponytail, then /plugin install ponytail@ponytail'); }
 }
 const codexConfig = path.join(HOME, '.codex', 'config.toml');
