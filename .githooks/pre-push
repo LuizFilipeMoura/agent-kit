@@ -1,0 +1,3 @@
+#!/bin/sh
+# Refuses the push when a tracked file or an outgoing commit message contains a denylisted term (see scan.js).
+exec node "$(dirname "$0")/scan.js"

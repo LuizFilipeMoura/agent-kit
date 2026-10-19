@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+:root {
+  --bg:#f7f7f5; --card:#ffffff; --fg:#1d2330; --muted:#5d6676; --rule:#e2e4e8; --soft:#eef1f6;
+  --add:#1f8a4c; --chg:#b7791f; --rm:#c2412d; --mv:#3d6fc4;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#13161c; --card:#1b1f27; --fg:#e6e9ef; --muted:#a2aab8; --rule:#2c323d; --soft:#232935;
+  --add:#4cc27f; --chg:#e0a84a; --rm:#ef7a64; --mv:#6f9be6; color-scheme:dark;
+} }
+:root[data-theme="dark"] {
+  --bg:#13161c; --card:#1b1f27; --fg:#e6e9ef; --muted:#a2aab8; --rule:#2c323d; --soft:#232935;
+  --add:#4cc27f; --chg:#e0a84a; --rm:#ef7a64; --mv:#6f9be6; color-scheme:dark;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.page { max-width:1440px; margin:0 auto; padding:28px 16px 80px; display:grid; grid-template-columns:minmax(0,1fr) 360px; gap:24px; }
+@media (max-width: 1000px) { .page { grid-template-columns:minmax(0,1fr); } }
+h1 { font-size:26px; margin:0 0 4px; } h2 { font-size:20px; margin:40px 0 4px; padding-top:12px; border-top:1px solid var(--rule); }
+.lede, .hint { color:var(--muted); margin:0 0 14px; max-width:80ch; } .hint { font-size:13px; }
+a { color:var(--mv); } code { font:12.5px ui-monospace, Consolas, monospace; background:var(--soft); padding:1px 5px; border-radius:4px; overflow-wrap:anywhere; }
+.tiles { display:grid; grid-template-columns:repeat(auto-fit, minmax(92px, 1fr)); gap:10px; margin:16px 0 4px; }
+.tile { background:var(--card); border:1px solid var(--rule); border-radius:10px; padding:10px 12px; }
+.tile.warn { border-color:var(--rm); } .tile.warn b { color:var(--rm); }
+.tile b { display:block; font-size:22px; font-variant-numeric:tabular-nums; } .tile span { font-size:12.5px; color:var(--muted); }
+.story { margin:10px 0 0; padding-left:20px; max-width:90ch; } .story li { margin:6px 0; }
+.tbar { display:flex; height:14px; border-radius:7px; overflow:hidden; margin:14px 0 10px; }
+.themes { display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:8px; }
+.themes button { text-align:left; font:inherit; color:inherit; background:var(--card); border:1px solid var(--rule); border-radius:10px; padding:8px 10px; cursor:pointer; }
+.themes button[aria-pressed="true"] { outline:2px solid var(--fg); } .themes small { display:block; color:var(--muted); font-size:12.5px; }
+.dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:0; }
+.bar { display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; margin:10px 0; font-size:13.5px; }
+.seg { display:inline-flex; border:1px solid var(--rule); border-radius:8px; overflow:hidden; }
+.seg button { font:inherit; font-size:13px; border:0; background:var(--card); color:var(--fg); padding:4px 10px; cursor:pointer; }
+.seg button[aria-pressed="true"] { background:var(--fg); color:var(--bg); }
+.chip { font:inherit; font-size:13px; border:1px solid var(--rule); background:var(--card); color:var(--fg); border-radius:999px; padding:3px 10px; cursor:pointer; }
+.chip[aria-pressed="false"] { opacity:.45; text-decoration:line-through; }
+input[type="search"] { font:inherit; font-size:13.5px; padding:5px 10px; border:1px solid var(--rule); border-radius:8px; background:var(--card); color:var(--fg); min-width:220px; }
+.crumbs { font-size:13.5px; margin:6px 0; } .crumbs button { font:inherit; border:0; background:none; color:var(--mv); cursor:pointer; padding:0 2px; }
+.mapbox { background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:6px; }
+#tm { display:block; width:100%; }
+#tm .dir > rect { fill:var(--card); stroke:var(--rule); } #tm .dirhead { cursor:zoom-in; }
+#tm .dirhead text { font:600 11.5px system-ui, sans-serif; fill:var(--muted); }
+#tm .dirhead:hover text, #tm .dirhead:focus text { fill:var(--fg); text-decoration:underline; }
+#tm .f { cursor:pointer; } #tm .f rect { stroke-width:1; } #tm .f text { font:11px system-ui, sans-serif; fill:var(--fg); pointer-events:none; }
+#tm .f text.n { font:10px ui-monospace, Consolas, monospace; fill:var(--muted); }
+#tm .f.dim { opacity:.14; } #tm .f.sel rect { stroke:var(--fg); stroke-width:3; }
+#tm :focus { outline:none; } #tm :focus-visible rect { stroke:var(--fg); stroke-width:2.5; }
+.cmp { --gut:72px; position:relative; background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:8px 10px; font:12.5px/1.25 ui-monospace, Consolas, monospace; }
+.crow { display:grid; grid-template-columns:minmax(0,1fr) var(--gut) minmax(0,1fr); }
+.crow.hd { font:600 13.5px system-ui, sans-serif; padding:2px 0 8px; border-bottom:1px solid var(--rule); margin-bottom:4px; } .crow.hd small { color:var(--muted); font-weight:400; }
+.c { display:flex; gap:6px; align-items:baseline; padding:2px 4px; border-radius:4px; min-width:0; min-height:21px; }
+.c .nm { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .c .ln { color:var(--muted); font-size:11px; white-space:nowrap; }
+.c .b { font:700 10.5px system-ui, sans-serif; width:15px; text-align:center; border-radius:3px; color:var(--bg); flex:none; }
+.c[data-k] { cursor:pointer; } .c.d { color:var(--muted); cursor:pointer; } .c.d:hover { color:var(--fg); }
+.crow.u .c { color:var(--muted); } .c.sD .nm { text-decoration:line-through; } .c.empty { background:repeating-linear-gradient(135deg, transparent 0 5px, var(--soft) 5px 6px); }
+.c.hl, .c.sel { background:var(--soft); outline:1.5px solid var(--fg); }
+#links { position:absolute; top:0; height:100%; width:var(--gut); overflow:visible; pointer-events:none; }
+#links path { fill:none; stroke-width:1.5; opacity:.45; } #links path.hl { stroke-width:3.2; opacity:1; }
+@media (max-width: 760px) { .cmp { --gut:18px; padding:6px; font-size:11.5px; } .c .ln { display:none; } }
+aside { position:sticky; top:16px; align-self:start; max-height:calc(100vh - 32px); overflow:auto; background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:14px 16px; }
+@media (max-width: 1000px) { aside { position:static; max-height:none; order:-1; } }
+aside h3 { margin:8px 0 2px; font-size:17px; overflow-wrap:anywhere; } aside h4 { margin:14px 0 2px; font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+aside p { margin:2px 0; } .pill { display:inline-block; font:600 12px system-ui, sans-serif; padding:1px 9px; border-radius:999px; color:var(--bg); margin-right:6px; }
+.keys { list-style:none; padding:0; margin:6px 0 0; } .keys li { margin:4px 0; display:flex; align-items:baseline; gap:2px; } .keys button { font:inherit; font-size:13px; text-align:left; border:0; background:none; color:var(--mv); cursor:pointer; padding:0; overflow-wrap:anywhere; }
+.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<div class="page">
+<main>
+  <h1>{{TITLE}}</h1>
+  <p class="lede" id="lede"></p>
+  <div class="tiles" id="tiles"></div>
+
+  <h2 id="why">Why the folders changed</h2>
+  <!--STORY-->
+  <div class="tbar" id="tbar" aria-hidden="true"></div>
+  <p class="hint">Files per theme. Click a theme to show only those files in the map and the trees. Click it again to show all.</p>
+  <div class="themes" id="themes"></div>
+
+  <h2 id="map">Map</h2>
+  <p class="hint">Each tile is a file, sized by the lines it changed. Click a folder's name to zoom in, and use the path to zoom out. Click a file to see what changed in it and why. Lighter tiles are tests.</p>
+  <div class="bar">
+    <span>Colour</span><span class="seg" id="colorSeg"><button data-v="status">Status</button><button data-v="theme">Theme</button></span>
+    <span>Size</span><span class="seg" id="sizeSeg"><button data-v="lines">Lines changed</button><button data-v="equal">Equal</button></span>
+    <label><input type="checkbox" id="hideTests"> Hide tests</label>
+    <input type="search" id="q" placeholder="Find a file…" aria-label="Find a file">
+  </div>
+  <div class="bar" id="statusChips" aria-label="Filter by status"></div>
+  <div class="bar" id="themeLegend" aria-label="Filter by theme"></div>
+  <div class="crumbs" id="crumbs"></div>
+  <div class="mapbox"><svg id="tm" role="group" aria-label="Treemap of changed files"></svg></div>
+
+  <h2 id="structure">Folder structure, before and after</h2>
+  <p class="hint">Left: the base branch. Right: the PR branch. The same folder or file sits on the same row on both sides, and a hatched cell means the file doesn't exist on that side. Lines join a moved file to its new path (solid blue) and a deleted file to the file that took over its job (dashed red). Click a folder to fold it. Hover a file to light up its other end.</p>
+  <div class="bar">
+    <label><input type="checkbox" id="showU"> Show unchanged files in these folders</label>
+    <button class="chip" id="expandAll">Expand all</button><button class="chip" id="collapseAll">Fold all</button>
+  </div>
+  <div class="cmp" id="cmp"></div>
+</main>
+<aside id="detail" aria-live="polite"></aside>
+</div>
+<script type="application/json" id="data">/*DATA*/null</script>
+<script>
+const RAW = document.getElementById('data').textContent;
+const D = RAW.includes('/*DATA*/') ? null : JSON.parse(RAW);
+if (!D) { // the template itself, opened before build.js filled in the data
+  document.querySelector('.page').innerHTML = '<main><h1>Template only</h1><p class="lede">This is the generator template. Maps are built into <code>diagrams/pr-maps/&lt;repo&gt;/pr-&lt;n&gt;-file-map.html</code> by <code>node ~/agent-kit/tools/pr-maps/build.js &lt;owner/repo&gt; &lt;pr&gt;</code>, run from the workspace folder.</p></main>';
+  throw new Error('template only: build a map with ~/agent-kit/tools/pr-maps/build.js');
+}
+const THEMES = D.themes;
+const REPO_NAME = D.meta.repo.split('/')[1];
+const STATUS = { A: ['Created', 'var(--add)'], M: ['Changed', 'var(--chg)'], D: ['Deleted', 'var(--rm)'], R: ['Moved', 'var(--mv)'] };
+const byPath = new Map(D.files.map(f => [f.p, f]));
+const byFrom = new Map(D.files.filter(f => f.from).map(f => [f.from, f]));
+const st = { color: 'status', size: 'lines', hideTests: false, statuses: new Set('AMDR'), theme: null, q: '', root: '', sel: null };
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const base = p => p.slice(p.lastIndexOf('/') + 1);
+const colorOf = f => st.color === 'status' ? STATUS[f.s][1] : THEMES[f.theme][1];
+const visible = f => st.statuses.has(f.s) && (!st.theme || f.theme === st.theme) && !(st.hideTests && f.test);
+const fmt = n => n.toLocaleString('en-US');
+const M = D.meta;
+$('#lede').innerHTML = `<a href="${esc(M.url)}">${esc(M.repo)}#${M.pr}</a>: <b>${esc(M.title)}</b>. It compares <code>${esc(M.base)}</code> (base) with <code>${esc(M.head)}</code> (head) at <code>${M.sha.slice(0, 9)}</code>, and shows every created, changed, deleted and moved file, with why.`;
+
+// ---- header tiles and themes ----
+{
+  const n = s => D.files.filter(f => f.s === s).length, sum = k => D.files.reduce((t, f) => t + f[k], 0);
+  const tests = D.files.filter(f => f.test);
+  $('#tiles').innerHTML = [
+    [D.files.length, 'files touched'], [n('A'), 'created'], [n('M'), 'changed'], [n('D'), 'deleted'], [n('R'), 'moved and renamed'],
+    ['+' + fmt(sum('a')), 'lines added'], ['−' + fmt(sum('d')), 'lines removed'],
+    [tests.length, `are tests (+${fmt(tests.reduce((t, f) => t + f.a, 0))} lines)`],
+    ...(D.files.some(f => f.theme === 'rider') ? [[D.files.filter(f => f.theme === 'rider').length, 'riders: not part of this PR', 'warn']] : []),
+  ].map(([b, s, c]) => `<div class="tile ${c || ''}"><b>${b}</b><span>${s}</span></div>`).join('');
+  const counts = Object.keys(THEMES).map(k => [k, D.files.filter(f => f.theme === k)]).filter(([, fs]) => fs.length).sort((a, b) => b[1].length - a[1].length);
+  $('#tbar').innerHTML = counts.map(([k, fs]) => `<span style="flex:${fs.length};background:${THEMES[k][1]}" title="${THEMES[k][0]}: ${fs.length}"></span>`).join('');
+  $('#themes').innerHTML = counts.map(([k, fs]) => `<button data-t="${k}" aria-pressed="false"><b><span class="dot" style="background:${THEMES[k][1]}"></span>${THEMES[k][0]}</b> · ${fs.length} files, ${fs.filter(f => f.test).length} tests<small>${THEMES[k][2]}</small></button>`).join('');
+  $('#themes').onclick = $('#themeLegend').onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    st.theme = st.theme === b.dataset.t ? null : b.dataset.t;
+    $('#themes').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.t === st.theme));
+    if (st.theme) st.color = 'theme';
+    syncSegs(); drawMap(); filterTrees();
+  };
+}
+
+// ---- toolbar ----
+function syncSegs() {
+  for (const [id, k] of [['#colorSeg', 'color'], ['#sizeSeg', 'size']])
+    $(id).querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === st[k]));
+  $('#statusChips').innerHTML = Object.entries(STATUS).map(([s, [l, c]]) =>
+    `<button class="chip" data-s="${s}" aria-pressed="${st.statuses.has(s)}"><span class="dot" style="background:${c}"></span>${l} · ${D.files.filter(f => f.s === s).length}</button>`).join('');
+  $('#themeLegend').innerHTML = st.color !== 'theme' ? '' : Object.entries(THEMES).map(([k, [l, c]]) =>
+    `<button class="chip" data-t="${k}" aria-pressed="${!st.theme || st.theme === k}"><span class="dot" style="background:${c}"></span>${l}</button>`).join('');
+}
+$('#colorSeg').onclick = e => { if (e.target.dataset.v) { st.color = e.target.dataset.v; syncSegs(); drawMap(); } };
+$('#sizeSeg').onclick = e => { if (e.target.dataset.v) { st.size = e.target.dataset.v; syncSegs(); drawMap(); } };
+$('#statusChips').onclick = e => {
+  const s = e.target.closest('button')?.dataset.s; if (!s) return;
+  st.statuses.has(s) ? st.statuses.delete(s) : st.statuses.add(s);
+  if (!st.statuses.size) st.statuses = new Set('AMDR');
+  syncSegs(); drawMap(); filterTrees();
+};
+$('#hideTests').onchange = e => { st.hideTests = e.target.checked; drawMap(); filterTrees(); };
+$('#q').oninput = e => { st.q = e.target.value.trim().toLowerCase(); drawMap(); };
+
+// ---- treemap ----
+function squarify(items, x, y, w, h) {
+  const out = [], total = items.reduce((t, i) => t + i.v, 0);
+  if (!total || w <= 0 || h <= 0) return out;
+  const k = (w * h) / total, rest = items.slice();
+  const worst = (row, side) => {
+    const a = row.map(i => i.v * k), s = a.reduce((t, v) => t + v, 0);
+    return Math.max(side * side * Math.max(...a) / (s * s), (s * s) / (side * side * Math.min(...a)));
+  };
+  const lay = row => {
+    const s = row.reduce((t, i) => t + i.v * k, 0);
+    if (w >= h) { const cw = s / h; let cy = y; for (const i of row) { const ih = i.v * k / cw; out.push({ i, x, y: cy, w: cw, h: ih }); cy += ih; } x += cw; w -= cw; }
+    else { const rh = s / w; let cx = x; for (const i of row) { const iw = i.v * k / rh; out.push({ i, x: cx, y, w: iw, h: rh }); cx += iw; } y += rh; h -= rh; }
+  };
+  let row = [];
+  while (rest.length) {
+    const side = Math.min(w, h);
+    if (!row.length || worst([...row, rest[0]], side) <= worst(row, side)) row.push(rest.shift());
+    else { lay(row); row = []; }
+  }
+  if (row.length) lay(row);
+  return out;
+}
+function buildTree(fs, root) {
+  const top = { name: root || REPO_NAME, path: root, dirs: new Map(), files: [] };
+  for (const f of fs) {
+    const segs = (root ? f.p.slice(root.length + 1) : f.p).split('/');
+    let n = top;
+    for (const s of segs.slice(0, -1)) {
+      if (!n.dirs.has(s)) n.dirs.set(s, { name: s, path: (n.path ? n.path + '/' : '') + s, dirs: new Map(), files: [] });
+      n = n.dirs.get(s);
+    }
+    n.files.push(f);
+  }
+  const fold = n => { // collapse folder chains with one child folder and no files: src/clients/v2 -> one box
+    for (const [k, c] of n.dirs) {
+      fold(c);
+      if (c.dirs.size === 1 && !c.files.length) { const [g] = c.dirs.values(); g.name = c.name + '/' + g.name; n.dirs.set(k, g); }
+    }
+    n.v = [...n.dirs.values()].reduce((t, c) => t + c.v, 0) + n.files.reduce((t, f) => t + val(f), 0);
+  };
+  fold(top);
+  return top;
+}
+const val = f => st.size === 'equal' ? 1 : Math.max(f.a + f.d, 8);
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); parent && parent.appendChild(e); return e; };
+const clip = (s, w, px) => { const n = Math.floor((w - 8) / px); return n < 3 ? '' : s.length > n ? s.slice(0, n - 1) + '…' : s; };
+
+function drawMap() {
+  const svg = $('#tm'), W = svg.clientWidth || 900, H = Math.round(Math.min(760, Math.max(440, W * 0.62)));
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
+  const fs = D.files.filter(f => visible(f) && (!st.root || f.p.startsWith(st.root + '/')));
+  const tree = buildTree(fs, st.root);
+  const crumbs = st.root ? st.root.split('/') : [];
+  $('#crumbs').innerHTML = `<button data-r="">${esc(REPO_NAME)}</button>` + crumbs.map((c, i) => ` / <button data-r="${esc(crumbs.slice(0, i + 1).join('/'))}">${esc(c)}</button>`).join('') + ` <span class="hint">· ${fs.length} files</span>`;
+  if (!fs.length) { el('text', { x: 16, y: 30, fill: 'currentColor' }, svg).textContent = 'No files match these filters.'; return; }
+  (function draw(n, x, y, w, h, depth) {
+    let head = 0;
+    if (depth) {
+      const g = el('g', { class: 'dir' }, svg);
+      el('rect', { x, y, width: w, height: h, rx: 3 }, g);
+      if (h > 30 && w > 44) {
+        head = 17;
+        const hd = el('g', { class: 'dirhead', tabindex: 0, role: 'button', 'aria-label': `Zoom into ${n.path}`, 'data-r': n.path }, g);
+        el('rect', { x, y, width: w, height: head, fill: 'transparent' }, hd);
+        el('text', { x: x + 5, y: y + 12.5 }, hd).textContent = clip(n.name + '/', w, 6.6);
+        el('title', {}, hd).textContent = n.path + '/';
+      }
+    }
+    const p = depth ? 2 : 0;
+    const items = [...[...n.dirs.values()].map(d => ({ d, v: d.v })), ...n.files.map(f => ({ f, v: val(f) }))].sort((a, b) => b.v - a.v);
+    for (const r of squarify(items, x + p, y + head + p, w - 2 * p, h - head - 2 * p)) {
+      if (r.i.d) { if (r.w > 3 && r.h > 3) draw(r.i.d, r.x, r.y, r.w, r.h, depth + 1); continue; }
+      const f = r.i.f, c = colorOf(f);
+      const g = el('g', { class: 'f' + (st.sel === f.p ? ' sel' : '') + (st.q && !f.p.toLowerCase().includes(st.q) ? ' dim' : ''), tabindex: 0, role: 'button', 'data-p': f.p, 'aria-label': `${STATUS[f.s][0]}: ${f.p}` }, svg);
+      el('rect', { x: r.x + .5, y: r.y + .5, width: Math.max(r.w - 1, 0), height: Math.max(r.h - 1, 0), rx: 2, fill: c, 'fill-opacity': f.test ? .16 : .42, stroke: c }, g);
+      el('title', {}, g).textContent = `${f.p}\n${STATUS[f.s][0]} · +${f.a} −${f.d}\n${f.what}`;
+      if (r.w > 46 && r.h > 15) el('text', { x: r.x + 4, y: r.y + 13 }, g).textContent = clip(base(f.p), r.w, 6.2);
+      if (r.w > 46 && r.h > 30) el('text', { x: r.x + 4, y: r.y + 26, class: 'n' }, g).textContent = clip(`+${f.a} −${f.d}`, r.w, 6.2);
+    }
+  })(tree, 0, 0, W, H, 0);
+}
+const zoom = r => { st.root = r; drawMap(); };
+$('#crumbs').onclick = e => { const b = e.target.closest('button'); if (b) zoom(b.dataset.r); };
+const tmAct = e => {
+  const hd = e.target.closest('.dirhead'), f = e.target.closest('.f');
+  if (hd) zoom(hd.dataset.r); else if (f) select(f.dataset.p);
+};
+$('#tm').onclick = tmAct;
+$('#tm').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tmAct(e); } };
+new ResizeObserver(() => drawMap()).observe($('#tm').parentElement);
+
+// ---- detail panel ----
+function select(p) {
+  st.sel = p;
+  const f = byPath.get(p) || byFrom.get(p);
+  document.querySelectorAll('#tm .f.sel, #cmp .c.sel').forEach(x => x.classList.remove('sel'));
+  if (f) {
+    document.querySelectorAll(`#tm .f[data-p="${CSS.escape(f.p)}"]`).forEach(x => x.classList.add('sel'));
+    document.querySelectorAll(`#cmp .c[data-k="${CSS.escape(f.p)}"]`).forEach(x => x.classList.add('sel'));
+  }
+  renderDetail(f, p);
+}
+function renderDetail(f, p) {
+  const box = $('#detail');
+  if (!p) {
+    const keys = D.files.filter(x => x.key);
+    box.innerHTML = `<h3>Pick a file</h3><p class="hint">Click a tile in the map or a file in the trees to see what changed and why.</p>
+      <h4>Key files (${keys.length})</h4><ul class="keys">${keys.map(k => `<li><span class="dot" style="background:${STATUS[k.s][1]}"></span><button data-j="${esc(k.p)}">${esc(k.p.replace(/^src\//, ''))}</button></li>`).join('')}</ul>`;
+    return;
+  }
+  if (!f) {
+    box.innerHTML = `<p><button class="chip" data-j="">← key files</button></p><h3>${esc(base(p))}</h3><p><code>${esc(p)}</code></p><p class="hint">This PR does not change this file. It appears for context only.</p>`;
+    return;
+  }
+  const [sl, sc] = STATUS[f.s], [tl, tc] = THEMES[f.theme];
+  const link = (label, q) => q ? `<h4>${label}</h4><p>${byPath.has(q) || byFrom.has(q) ? `<button class="chip" data-j="${esc(q)}">${esc(q)}</button>` : `<code>${esc(q)}</code>`}</p>` : '';
+  const replacing = D.files.filter(x => x.rb === f.p);
+  box.innerHTML = `<p><button class="chip" data-j="">← key files</button></p>
+    <p><span class="pill" style="background:${sc}">${sl}</span><span class="dot" style="background:${tc}"></span>${tl}${f.test ? ' · test' : ''}${f.key ? ' · key file' : ''}</p>
+    <h3>${esc(base(f.p))}</h3><p><code>${esc(f.p)}</code></p>
+    <p class="hint">+${fmt(f.a)} / −${fmt(f.d)} lines</p>
+    <h4>What</h4><p>${esc(f.what)}</p><h4>Why</h4><p>${esc(f.why)}</p>
+    ${f.from ? link('Moved from', f.from) : ''}${f.s === 'D' ? (f.rb ? link('Its job moved to', f.rb) : '<h4>Its job moved to</h4><p class="hint">Nothing. The job is gone.</p>') : ''}
+    ${replacing.length ? `<h4>Takes over from (deleted)</h4><p>${replacing.map(x => `<button class="chip" data-j="${esc(x.p)}">${esc(x.p)}</button>`).join(' ')}</p>` : ''}
+    <h4>Source</h4><p><a href="${f.gh}" target="_blank" rel="noopener">Open this file's diff on GitHub ↗</a></p>`;
+}
+$('#detail').onclick = e => {
+  const j = e.target.closest('[data-j]'); if (!j) return;
+  const p = j.dataset.j, f = byPath.get(p) || byFrom.get(p);
+  if (f && st.root && !f.p.startsWith(st.root + '/')) zoom('');
+  select(p || null);
+};
+
+// ---- before / after, aligned: one row per path, left = base, right = head ----
+const cmpRows = new Map(); // path -> { p, L, R }; a side holds the file note, 'u' for an unchanged file, or null
+const put = (p, side, f) => { const e = cmpRows.get(p) || { p, L: null, R: null }; e[side] = f || 'u'; cmpRows.set(p, e); };
+for (const f of D.files) { if (f.s !== 'A') put(f.from || f.p, 'L', f); if (f.s !== 'D') put(f.p, 'R', f); }
+D.before.forEach(p => put(p, 'L')); D.after.forEach(p => put(p, 'R'));
+const cmpTop = { path: '', dirs: new Map(), rows: [] };
+for (const e of cmpRows.values()) {
+  let n = cmpTop;
+  for (const s of e.p.split('/').slice(0, -1)) {
+    if (!n.dirs.has(s)) n.dirs.set(s, { name: s, path: (n.path ? n.path + '/' : '') + s, dirs: new Map(), rows: [] });
+    n = n.dirs.get(s);
+  }
+  n.rows.push(e);
+}
+(function fold(n) {
+  for (const [k, c] of n.dirs) { fold(c); if (c.dirs.size === 1 && !c.rows.length) { const [g] = c.dirs.values(); g.name = c.name + '/' + g.name; n.dirs.set(k, g); } }
+  n.L = n.rows.some(e => e.L) || [...n.dirs.values()].some(c => c.L);
+  n.R = n.rows.some(e => e.R) || [...n.dirs.values()].some(c => c.R);
+})(cmpTop);
+const folded = new Set();
+const fileOf = e => (e.L && e.L !== 'u' ? e.L : e.R && e.R !== 'u' ? e.R : null);
+const pad = d => `style="padding-left:${d * 14 + 4}px"`;
+function cell(e, side, depth) {
+  const v = e[side];
+  if (!v) return '<div class="c empty"></div>';
+  if (v === 'u') return `<div class="c" data-side="${side}" data-p="${esc(e.p)}" data-k="${esc(e.p)}" ${pad(depth)}><span class="b">·</span><span class="nm">${esc(base(e.p))}</span></div>`;
+  const f = v, L = side === 'L';
+  const note = L && f.s === 'R' ? ' → moved' : L && f.s === 'D' && f.rb ? ' → replaced' : !L && f.s === 'R' ? ' ← moved in' : '';
+  const ln = (L ? f.s === 'D' : f.s !== 'D') ? `<span class="ln">+${f.a} −${f.d}</span>` : '';
+  return `<div class="c s${f.s}" data-side="${side}" data-p="${esc(e.p)}" data-k="${esc(f.p)}" title="${esc(f.what)}" ${pad(depth)}><span class="b" style="background:${STATUS[f.s][1]}">${f.s}</span><span class="nm">${esc(base(e.p))}<span class="ln">${note}</span></span>${ln}</div>`;
+}
+function cmpNode(n, depth) {
+  let inner = '';
+  for (const d of [...n.dirs.values()].sort((a, b) => a.name.localeCompare(b.name))) inner += cmpNode(d, depth + 1);
+  for (const e of n.rows.slice().sort((a, b) => base(a.p).localeCompare(base(b.p)))) {
+    const f = fileOf(e);
+    if (f ? visible(f) : $('#showU').checked) inner += `<div class="crow${f ? '' : ' u'}">${cell(e, 'L', depth + 1)}<div></div>${cell(e, 'R', depth + 1)}</div>`;
+  }
+  if (!inner || !n.path) return inner;
+  const shut = folded.has(n.path);
+  const side = s => n[s] ? `<div class="c d" role="button" tabindex="0" aria-expanded="${!shut}" data-dir="${esc(n.path)}" ${pad(depth)}><span class="nm">${shut ? '▸' : '▾'} ${esc(n.name)}/</span></div>` : '<div class="c empty"></div>';
+  return `<div class="crow">${side('L')}<div></div>${side('R')}</div>` + (shut ? '' : inner);
+}
+const pairs = D.files.filter(f => f.s === 'R' || (f.s === 'D' && f.rb)).map(f => f.s === 'R'
+  ? { from: f.from, to: f.p, c: 'var(--mv)', dash: '' }
+  : { from: f.p, to: f.rb, c: 'var(--rm)', dash: '5 4' });
+function filterTrees() {
+  $('#cmp').innerHTML = `<div class="crow hd"><div>Before <small>${esc(M.base)} · base</small></div><div></div><div>After <small>${esc(M.head)} · this PR</small></div></div>`
+    + cmpNode(cmpTop, -1) + '<svg id="links" aria-hidden="true"></svg>';
+  if (st.sel) document.querySelectorAll(`#cmp .c[data-k="${CSS.escape(st.sel)}"]`).forEach(x => x.classList.add('sel'));
+  drawLinks();
+}
+function drawLinks() {
+  const box = $('#cmp'), svg = $('#links'), b = box.getBoundingClientRect(), g = box.querySelector('.crow.hd > :nth-child(2)').getBoundingClientRect();
+  svg.style.left = (g.left - b.left) + 'px';
+  svg.replaceChildren();
+  for (const pr of pairs) {
+    const l = box.querySelector(`.c[data-side="L"][data-p="${CSS.escape(pr.from)}"]`), r = box.querySelector(`.c[data-side="R"][data-p="${CSS.escape(pr.to)}"]`);
+    if (!l || !r) continue;
+    const y1 = l.getBoundingClientRect().top + 10.5 - b.top, y2 = r.getBoundingClientRect().top + 10.5 - b.top, w = g.width;
+    const path = el('path', { d: `M0 ${y1} C${w / 2} ${y1} ${w / 2} ${y2} ${w} ${y2}`, stroke: pr.c, 'stroke-dasharray': pr.dash, 'data-a': pr.from, 'data-b': pr.to }, svg);
+    el('title', {}, path).textContent = `${pr.from}\n→ ${pr.to}`;
+  }
+}
+$('#showU').onchange = filterTrees;
+$('#expandAll').onclick = () => { folded.clear(); filterTrees(); };
+$('#collapseAll').onclick = () => { (function all(n) { for (const c of n.dirs.values()) { folded.add(c.path); all(c); } })(cmpTop); filterTrees(); };
+new ResizeObserver(drawLinks).observe($('#cmp'));
+$('#cmp').onmouseover = e => {
+  const c = e.target.closest('.c[data-k]');
+  document.querySelectorAll('#cmp .hl').forEach(x => x.classList.remove('hl'));
+  if (!c) return;
+  const f = byPath.get(c.dataset.k);
+  const ps = new Set([c.dataset.p, c.dataset.k, f?.from, f?.rb, ...D.files.filter(x => x.rb === c.dataset.k).map(x => x.p)].filter(Boolean));
+  ps.forEach(p => document.querySelectorAll(`#cmp .c[data-p="${CSS.escape(p)}"]`).forEach(x => x.classList.add('hl')));
+  document.querySelectorAll('#links path').forEach(x => { if (ps.has(x.dataset.a) || ps.has(x.dataset.b)) x.classList.add('hl'); });
+};
+const cmpAct = e => {
+  const d = e.target.closest('.c.d'), c = e.target.closest('.c[data-k]');
+  if (d) { folded.has(d.dataset.dir) ? folded.delete(d.dataset.dir) : folded.add(d.dataset.dir); filterTrees(); }
+  else if (c) select(c.dataset.k);
+};
+$('#cmp').onclick = cmpAct;
+$('#cmp').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cmpAct(e); } };
+syncSegs(); drawMap(); renderDetail(null, null); filterTrees();
+</script>
+</body>
+</html>
