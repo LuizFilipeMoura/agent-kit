@@ -69,7 +69,6 @@ The agent picks the kind first. Omit any section that has nothing to say.
 5. Decisions you might push back on: at most 5, each with the alternative rejected and who decided.
 6. What changes for people: user, operator and API-consumer behaviour, including what is newly refused.
 7. For the reviewer:
-   - **Judge and skip:** one line on where the size is ("judge about N lines of production code and migration; the M lines of tests back the rule table; K lines were already reviewed in PR X").
    - **Look first:** 3 to 5 entry points, each a file and why.
    - **Risk and rollout:** migration, deploy order, what breaks if done wrong.
    - **Temporarily wrong until:** anything this PR leaves incomplete on purpose, and which PR completes it.
