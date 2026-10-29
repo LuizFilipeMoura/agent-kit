@@ -1,6 +1,6 @@
 # PR descriptions that lower the reviewer's load
 
-Status: proposed, 2026-10-29. Replaces rule 15 (file maps) and changes how rules 4, 5, 12, 14 and 17 reach a PR body.
+Status: accepted, 2026-10-29. Replaces rule 15 (file maps) and changes how rules 4, 5, 12, 14 and 17 reach a PR body.
 
 ## Problem
 
@@ -60,16 +60,23 @@ The agent picks the kind first. Omit any section that has nothing to say.
 2. New terms: one line each, linked to the glossary.
 3. **The rule table,** the spine of the body:
 
-   | Rule | Before | After | Enforced in | Proven by |
-   |---|---|---|---|---|
-   | Who moves an order's status | any line item | only the order's fulfilment, through one gate | `order-state.gate.ts` | `order-state.gate.spec.ts` |
+   | Rule | Before | After |
+   |---|---|---|
+   | Who moves an order's status | any line item | only the order's fulfilment, through one gate |
 
-   Prose and the Before and After columns use domain words only. File and function names appear only in the last two columns, as links.
+   The table and the prose use domain words only. No file names here and no file-by-file list under it: "Look first" is the only place that ties rows to code.
 4. Diagrams: one map diagram of the concepts (entities, ownership, lifecycles, who may move what). Any further diagram zooms into one node of the map and must show something the table cannot. No cap, but every diagram has to pass that test.
-5. Decisions you might push back on: at most 5, each with the alternative rejected and who decided.
+5. Decisions you might push back on: at most 5. Each has all five parts:
+   - **Title:** the decision stated positively ("Every interview belongs to a service", not "No fallback").
+   - **Why:** one line.
+   - **Cost:** what the reviewer accepts by agreeing.
+   - **Rejected:** the alternatives.
+   - **Decided by:** a role or a `@handle` in backticks (no ping), plus the ADR link if there is one. "Agent, not confirmed" when nobody confirmed it. Never "user decision".
+
+   An item with no real cost or no rejected alternative is not a push-back decision: move it to "What changes for people" or drop it. Every term a decision uses is defined in New terms.
 6. What changes for people: user, operator and API-consumer behaviour, including what is newly refused.
 7. For the reviewer:
-   - **Look first:** 3 to 5 entry points, each a file and why.
+   - **Look first:** 3 to 5 entry points, each a link to the file at the PR's head, the table rows it enforces, and the spec that proves them.
    - **Risk and rollout:** migration, deploy order, what breaks if done wrong.
    - **Temporarily wrong until:** anything this PR leaves incomplete on purpose, and which PR completes it.
    - **Not verified by anyone:** one line.
@@ -94,7 +101,7 @@ Target: about 800 to 1,000 words plus diagrams for the largest changes.
 
 ### 5. Stack content has one home
 
-The stack map, merge order and deploy gate live in one place: a GitHub tracking issue for the stack, linked from every PR in it. Each PR's body gives one line: where it sits, what it depends on, what ships with it. A single PR with a deploy gate keeps the gate in its own risk-and-rollout section.
+The stack map, merge order and deploy gate live in one place: a GitHub tracking issue for the stack, created by `pr-workflow` once the stack has 2 or more PRs and linked from every PR in it. Each PR's body gives one line: where it sits, what it depends on, what ships with it. A single PR with a deploy gate keeps the gate in its own risk-and-rollout section.
 
 ### 6. History comment on each push that changes the story
 
@@ -102,7 +109,7 @@ After a push that changes what the PR does (a rebuild, a dropped piece, a new de
 
 ### 7. Cold-read check before publishing
 
-Before opening the PR or saving a rebuilt body, a fresh subagent on a cheap model gets only the body and `git diff --stat`. It must:
+Before opening the PR or saving a rebuilt body, a fresh Haiku subagent gets only the body and `git diff --stat`. It must:
 
 1. restate in three sentences how the system works differently;
 2. list the decisions a reviewer might reject;
@@ -110,7 +117,7 @@ Before opening the PR or saving a rebuilt body, a fresh subagent on a cheap mode
 4. say what was not verified;
 5. quote every sentence about how the branch or PR came to be (earlier PRs it replaces, rebuilds, "unchanged", "earlier design"). Each one is moved to the history comment.
 
-If any answer misses or contradicts the author's intent, rewrite and run it again. The result is reported in chat, not in the body. This is a skill step, not a hook: length and content stay guidance, and the cold read is the check that the guidance worked.
+If any answer misses or contradicts the author's intent, rewrite and run it again, at most 3 tries. After 3 misses, stop and show the user what the reader misunderstood. The result is reported in chat, not in the body. This is a skill step, not a hook: length and content stay guidance, and the cold read is the check that the guidance worked.
 
 ### 8. Diagram page (rule 12) shifts to concepts first
 

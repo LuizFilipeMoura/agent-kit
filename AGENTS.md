@@ -7,7 +7,7 @@ A project adds its specifics in its own `AGENTS.md`: repos, base branch, product
 Three layers carry the rules:
 
 - **This file:** the rules and why, loaded every session.
-- **Hooks:** `~/.claude/settings.json` runs `~/agent-kit/hooks/guard.js` on Claude's tool calls. It enforces rules 3, 10 and 16 everywhere, and rules 5 and 9 where the project's `.agents/guard.json` turns them on. It also reminds rules 4, 6, 12 and 15 when a PR is opened or pushed. A deny names the compliant way; an ask goes to the user. `hooks/pull.js` keeps the kit current at session start.
+- **Hooks:** `~/.claude/settings.json` runs `~/agent-kit/hooks/guard.js` on Claude's tool calls. It enforces rules 3, 10 and 16 everywhere, and rules 5 and 9 where the project's `.agents/guard.json` turns them on. It also reminds rules 4, 6 and 18 when a PR is opened or pushed. A deny names the compliant way; an ask goes to the user. `hooks/pull.js` keeps the kit current at session start.
 - **Skills:** `~/agent-kit/skills/`, linked into `~/.claude/skills/` and `~/.agents/skills/`, holds the how-to, loaded on demand.
 
 Tool names are Claude Code's (`Read`, `Grep`, `Glob`, `preview_start`, `ccd_pr`, `mcp__claude-in-chrome__*`). Other agents use their closest equivalent and follow the same rule.
@@ -21,7 +21,7 @@ Rule numbers are stable because memories, skills, scripts and PR ledgers cite th
 | Before you start | 3 `git status`, no worktrees · 2 grill medium and large tasks · 14 show schema changes |
 | While you work | 1 ponytail · 16 read with `Read`/`Grep`/`Glob` · 7 run commands yourself · 10 cap Jest · 11 check subprocesses every 5 minutes · 12 diagram pages · 13 taste skills for UI |
 | Testing | 8 the user's real browser first · 9 fake data only, never production |
-| Finishing | 17 done means verified · 4 stack · 5 survivable review · 15 file map · 6 check status before sharing a link |
+| Finishing | 17 done means verified · 4 stack · 5 survivable review · 18 PR description · 6 check status before sharing a link |
 
 ## Working rules
 
@@ -47,11 +47,11 @@ Use the glossary and ADR folder the project names; by default `GLOSSARY.md` and 
 
 ### 4. Stacked PRs
 
-When more than one feature is in flight, each gets its own branch and PR, stacked by dependency on the project's base branch (by default the repo's default branch). A feature that spans repos gets a matching stack in each, and each PR names its counterpart. Carried fixes are allowed in any PR when the description lists each one with what it changes and why. The steps are in the `pr-workflow` skill.
+When more than one feature is in flight, each gets its own branch and PR, stacked by dependency on the project's base branch (by default the repo's default branch). A feature that spans repos gets a matching stack in each, and each PR names its counterpart. Carried fixes are allowed in any PR when the description lists each one, one line with what it changes and why. A stack of 2 or more PRs keeps its map, merge order and deploy gate in one tracking issue that every PR links to. The steps are in the `pr-workflow` skill.
 
 ### 5. Survivable review on every PR
 
-Run `survivable-code-review` on each PR against its parent before pushing or opening it. A PR goes up only with **APPROVED** or **APPROVED WITH NOTES**, and its ledger `docs/reviews/<branch, with / as ->.md` is committed in that PR. Never use the original thermo-nuclear review: it has no exit and loops.
+Run `survivable-code-review` on each PR against its parent before pushing or opening it. A PR goes up only with **APPROVED** or **APPROVED WITH NOTES**, and its ledger `docs/reviews/<branch, with / as ->.md` is committed in that PR. Findings are settled in code, the ledger or a PR comment, never by editing the PR description. Never use the original thermo-nuclear review: it has no exit and loops.
 
 ### 6. Check status before sharing a PR link
 
@@ -91,7 +91,7 @@ Every background command, test run, build, migration, subagent and dev server yo
 
 ### 12. Diagram every change
 
-Every change gets a diagram before the code, so it can be checked and agreed on; typo-level edits are exempt. A small change needs one diagram, in chat and in its PR. Grilling, medium or large work, cross-repo changes and PR stacks get a full HTML page in the project's `diagrams/`, and every PR body carries its slice as Mermaid. When the plan changes, update the picture before the code. The how-to is in the `diagram-page` skill.
+Every change gets a diagram before the code, so it can be checked and agreed on; typo-level edits are exempt. A small change needs one diagram, in chat and in its PR. Grilling, medium or large work, cross-repo changes and PR stacks get a full HTML page in the project's `diagrams/` that leads with the concept map (entities, ownership, lifecycles, rules); code-path diagrams come second. The PR body draws its diagrams from that concept map (rule 18). When the plan changes, update the picture before the code. The how-to is in the `diagram-page` skill.
 
 ### 13. Taste skills for UI
 
@@ -99,11 +99,11 @@ Any UI work gets a taste skill: `redesign-existing-projects` for app screens (da
 
 ### 14. Show schema changes before making them
 
-Before changing stored data, relationships or which record owns a value, show the current and proposed schema side by side, with the real collection and field names and fake example records, on the rule 12 page and readable in chat. Say which record is the source of truth and how existing records and completed history are preserved, with the migration and conflict plan. Never silently discard conflicting historical values. Don't substitute an abstract architecture diagram or prose for the actual data shape. Reach agreement before implementing; an agreement already given in the current task counts, so don't ask for it again. The page layout is in the `diagram-page` skill.
+Before changing stored data, relationships or which record owns a value, show the current and proposed schema side by side, with the real collection and field names and fake example records, on the rule 12 page and readable in chat. Say which record is the source of truth and how existing records and completed history are preserved, with the migration and conflict plan. Never silently discard conflicting historical values. Don't substitute an abstract architecture diagram or prose for the actual data shape. Reach agreement before implementing; an agreement already given in the current task counts, so don't ask for it again. The page layout is in the `diagram-page` skill. In the PR body the data shape appears only as concepts in the rule table and map; the full schema stays on the page and in the ADR.
 
-### 15. Every PR gets a file map
+### 15. Retired
 
-Right after opening a PR, and after any push that changes its diff, build its file map with the `pr-file-map` skill and report the map link with the PR link. The map is extra: rule 12's Mermaid diagrams are still required in the description.
+File maps are retired; rule 18 replaced them. The number stays reserved.
 
 ### 16. Read with Read, Grep and Glob, not the shell
 
@@ -116,4 +116,8 @@ Shell commands go through auto mode's classifier, which pauses auto mode after 3
 
 ### 17. Done means verified
 
-Before saying a change is done, run the narrowest check that proves it (the spec files you touched, a typecheck, a build, or a screenshot of the screen) and show the output. If something couldn't be verified, say so.
+Before saying a change is done, run the narrowest check that proves it (the spec files you touched, a typecheck, a build, or a screenshot of the screen) and show the output. If something couldn't be verified, say so. The proof goes in the chat report and the review ledger; a PR body keeps only one "Not verified by anyone" line.
+
+### 18. PR descriptions lower the reviewer's load
+
+Every PR body follows the `pr-description` skill: it leads with how the system works differently, in the project's domain words, and gives the reviewer what the diff cannot (decisions worth challenging, where to look first, rollout risk, what nobody verified). Rebuild the body from scratch on every update; never append. Branch history goes in a PR comment, not the body. Before saving a body, a fresh Haiku subagent must read it cold and restate it correctly.

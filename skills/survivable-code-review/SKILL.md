@@ -121,6 +121,8 @@ Each row has one of four statuses:
 - `waived`, with a reason
 - `moot`, when the code was deleted for another reason
 
+A row is settled in code, in the ledger or in a PR comment, never by editing the PR description. The description doesn't list waivers either: the committed ledger holds them (rule 18).
+
 ## Passes and the exit
 
 1. **Pass 1** reviews the whole PR diff with both lenses.

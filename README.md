@@ -33,12 +33,12 @@ In PowerShell, write `$HOME/agent-kit` instead of `~/agent-kit`. Restart any ope
 
 | Path | What |
 |---|---|
-| `AGENTS.md` | The working rules, numbered 1–17 |
-| `skills/` | `diagram-page`, `pr-workflow`, `pr-file-map`, `survivable-code-review` |
-| `hooks/guard.js` | Enforces rules 3, 10 and 16 everywhere, and rules 5 and 9 where a project turns them on. Tests: `node --test ~/agent-kit/hooks/` |
+| `AGENTS.md` | The working rules, numbered 1 to 18 (15 is retired) |
+| `skills/` | `diagram-page`, `pr-workflow`, `pr-description`, `survivable-code-review` |
+| `hooks/guard.js` | Enforces rules 3, 10 and 16 everywhere, and rules 5 and 9 where a project turns them on. Tests: `node --test ~/agent-kit/hooks/guard.test.js` |
 | `hooks/pull.js` | The session-start update described above |
 | `tools/diagrams/` | `lib.js` (inline-SVG boxes, edges, sequences), `page.js` (page shell), `serve.js` (static server on 127.0.0.1:8799) |
-| `tools/pr-maps/` | Build, publish and tear down a PR's interactive file map |
+| `tools/pr-maps/teardown.js` | Removes the PR file maps published before rule 15 was retired; run from the workspace folder, `--dry-run` first |
 | `tools/jest-procs.js` | List Jest processes; `--kill-orphans` kills the ones whose parent is gone |
 | `setup.js` | One-time setup per PC |
 
@@ -60,7 +60,7 @@ A project describes itself in its own `AGENTS.md`: its repos, base branch, produ
 
 - **`productionHosts`:** the browser asks before navigating to these hosts or their subdomains, unless the host contains one of `testHostMarkers`.
 - **`reviewGate`:** `gh pr create` asks first unless the branch's committed review ledger ends on APPROVED.
-- **`baseBranch`:** what PRs stack on, and where the PR-map tools put their release tag. It defaults to the repo's default branch.
+- **`baseBranch`:** what PRs stack on. It defaults to the repo's default branch.
 
 ## Credits and licenses
 

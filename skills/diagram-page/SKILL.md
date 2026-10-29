@@ -1,6 +1,6 @@
 ---
 name: diagram-page
-description: Build, serve and keep current the rule 12 HTML page with inline-SVG diagrams, and redraw it as Mermaid for PR descriptions. Also the side-by-side schema page that rule 14 requires. Use before medium or large work, cross-repo changes, PR stacks, schema or ownership changes, and whenever a plan changes.
+description: Build, serve and keep current the rule 12 HTML page with inline-SVG diagrams, led by a concept map that PR descriptions redraw as Mermaid. Also the side-by-side schema page that rule 14 requires. Use before medium or large work, cross-repo changes, PR stacks, schema or ownership changes, and whenever a plan changes.
 ---
 
 # Diagram page (AGENTS.md rules 12 and 14)
@@ -22,7 +22,8 @@ Every change is diagrammed so it can be checked and agreed on before code. Typo-
   ```
 
   `page()` supplies the CSS (light and dark), the arrow markers and the `.tbl`, `.warn`, `nav` and `figure` styles.
-- Diagrams are inline SVG drawn from the real code paths, with file and function names. No generic boxes and no external libraries.
+- **Lead with the concept map:** the entities, who owns what, their lifecycles, and who may move what, in the project's domain words. This is what the user agrees to, and what the PR body redraws.
+- Then the code-path diagrams: inline SVG drawn from the real code paths, with file and function names. No generic boxes and no external libraries.
 - Draw what fits the change:
   - **System flow:** request path, client → server → database, queues and third-party calls
   - **Functions:** the branches, early returns, loops and error paths, before → after
@@ -58,16 +59,9 @@ Show a readable schema in chat too. Don't substitute an abstract architecture di
 
 ## PR descriptions
 
-GitHub strips HTML and inline SVG but renders Mermaid. Redraw the page's diagrams as Mermaid blocks in every PR body:
+The `pr-description` skill decides what a PR body holds. It redraws the page's concept map as Mermaid, plus any zoom that shows something its rule table cannot; it does not copy every code-path diagram. The stack map goes in the stack's tracking issue.
 
-- the before → after for every flow, function, mapping or component the PR changes
-- the end shape
-- for stacks, where this PR sits and what it carries, plus the stack map
-- for mappings, a Markdown table when it reads better
-
-Each PR in a stack carries only its own slice. A PR without its diagrams isn't ready to open.
-
-GitHub Mermaid quirks:
+GitHub strips HTML and inline SVG but renders Mermaid. Its quirks:
 
 - `<id>` in sequence diagrams is stripped as HTML; write `{id}`.
 - A cross-subgraph edge in a TB stack map stacks the subgraphs vertically; drop it and put the note in the node label.

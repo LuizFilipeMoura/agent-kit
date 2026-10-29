@@ -1,4 +1,4 @@
-// agent-kit hook for AGENTS.md rules 3, 5, 9, 10, 15 and 16. Reads the hook event JSON on stdin and prints
+// agent-kit hook for AGENTS.md rules 3, 5, 9, 10, 16 and 18. Reads the hook event JSON on stdin and prints
 // a PreToolUse decision (deny / ask) or extra context. Prints nothing when the call is fine.
 // Rules 5 (review gate) and 9 (production hosts) only apply where the project's .agents/guard.json turns them on.
 const { execFileSync } = require('child_process');
@@ -105,8 +105,8 @@ const out = (event, fields) => ({ hookSpecificOutput: { hookEventName: event, ..
 const deny = (reason) => out('PreToolUse', { permissionDecision: 'deny', permissionDecisionReason: reason });
 const ask = (reason) => out('PreToolUse', { permissionDecision: 'ask', permissionDecisionReason: reason });
 
-const PR_CHECKLIST = 'PR checklist (pr-workflow skill): the body lists every carried fix with what it changes and why (rule 4), '
-  + 'carries the Mermaid before → after, end shape and stack map (rule 12), and names the counterpart PR for cross-repo work (rule 4).';
+const PR_CHECKLIST = 'PR checklist (pr-workflow skill): the body is written with the pr-description skill and passed its cold read (rule 18), '
+  + 'lists every carried fix in one line (rule 4), links the stack\'s tracking issue instead of copying it, and names the counterpart PR for cross-repo work (rule 4).';
 
 function decide(input, env = realEnv) {
   const { hook_event_name: event, tool_name: tool, tool_input: ti = {}, cwd = process.cwd() } = input;
@@ -115,10 +115,10 @@ function decide(input, env = realEnv) {
   if (event === 'PostToolUse') {
     // Only when a PR URL came back, so --help and failed creates stay quiet.
     if (segs.some((s) => /^gh\s+pr\s+create\b/.test(s)) && /\/pull\/\d+/.test(JSON.stringify(input.tool_response ?? ''))) {
-      return out(event, { additionalContext: 'PR opened. Next: build its file map with the pr-file-map skill (rule 15), then check its status (rule 6) and report the link with state, base, CI, mergeability and the map link.' });
+      return out(event, { additionalContext: 'PR opened. Next: check its status (rule 6) and report the link with state, base, CI and mergeability, plus the cold-read result (rule 18).' });
     }
     if (segs.some((s) => gitSub(s)[0] === 'push')) {
-      return out(event, { additionalContext: 'Pushed. If this branch has an open PR whose diff changed: rebuild and republish its file map (rule 15) and rebase the PRs stacked above it (rule 4).' });
+      return out(event, { additionalContext: 'Pushed. If this branch has an open PR whose story changed: rebuild its body with the pr-description skill and post a history comment (rule 18), and rebase the PRs stacked above it (rule 4).' });
     }
     return null;
   }

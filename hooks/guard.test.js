@@ -79,10 +79,12 @@ test('rule 5: gh pr create needs an approved committed ledger where the gate is 
   assert.equal(decision(sh('gh pr create --head feat/none', env({ cfg: {} }))), 'context');
 });
 
-test('rules 15 and 6: reminders after gh pr create and git push', () => {
+test('rules 18 and 6: reminders after gh pr create and git push', () => {
   const post = (command, stdout = '') => decide({ hook_event_name: 'PostToolUse', tool_name: 'Bash', tool_input: { command }, tool_response: { stdout } }, env());
-  assert.match(post('gh pr create --fill', 'https://github.com/o/r/pull/12\n').hookSpecificOutput.additionalContext, /file map/);
+  assert.match(post('gh pr create --fill', 'https://github.com/o/r/pull/12\n').hookSpecificOutput.additionalContext, /status \(rule 6\)/);
   assert.equal(post('gh pr create --help', 'USAGE'), null);
-  assert.match(post('git -C "a b" push origin x').hookSpecificOutput.additionalContext, /rebase/);
+  const pushed = post('git -C "a b" push origin x').hookSpecificOutput.additionalContext;
+  assert.match(pushed, /pr-description/);
+  assert.match(pushed, /rebase/);
   assert.equal(post('git status'), null);
 });

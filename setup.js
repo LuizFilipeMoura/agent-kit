@@ -22,6 +22,13 @@ const writeIfChanged = (file, text) => {
 // 1. The kit's skills, linked for Claude Code and Codex: one copy, two readers.
 for (const dir of [path.join(HOME, '.claude', 'skills'), path.join(HOME, '.agents', 'skills')]) {
   fs.mkdirSync(dir, { recursive: true });
+  // Drop links to kit skills that were removed, so other PCs don't keep a dead skill.
+  for (const name of fs.readdirSync(dir)) {
+    const link = path.join(dir, name);
+    if (!fs.lstatSync(link).isSymbolicLink()) continue;
+    const target = path.resolve(fs.readlinkSync(link));
+    if (target.startsWith(path.join(KIT, 'skills')) && !fs.existsSync(target)) { fs.unlinkSync(link); say(`removed ${link}: no longer in the kit`); }
+  }
   for (const name of fs.readdirSync(path.join(KIT, 'skills'))) {
     const link = path.join(dir, name);
     let stat = null;
