@@ -110,8 +110,8 @@ Before opening the PR or saving a rebuilt body, run a fresh `general-purpose` su
 > 2. Which decisions might a reviewer reject?
 > 3. Where is the riskiest place to look?
 > 4. What was not verified?
-> 5. Quote every sentence about how the branch or PR came to be (earlier PRs, rebuilds, "unchanged", earlier designs).
-> 6. Quote every term you could not understand from the body.
+> 5. Quote every sentence about how the branch or PR came to be (earlier PRs, rebuilds, "unchanged", earlier designs). The stack line and carried fixes are not history.
+> 6. Quote every term this change introduces that the body uses without defining. Skip words any developer on this codebase already knows.
 
 Compare the answers with your intent. If any answer misses or contradicts it, move each quoted history sentence to the history comment, define each unclear term, rewrite, and run a fresh reader again: at most 3 tries. After 3 misses, stop and show the user what the reader misunderstood.
 
