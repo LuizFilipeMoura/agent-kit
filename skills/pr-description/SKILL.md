@@ -1,6 +1,6 @@
 ---
 name: pr-description
-description: Write or rebuild a PR body that lowers the reviewer's load (AGENTS.md rule 18). It leads with how the system works differently, in domain words, then gives the reviewer what the diff cannot: the ADRs behind it, where to look first, the rollout risk and what nobody verified. Three shapes: model change, behaviour addition, bundle of fixes. Ends with a cold-read check by a fresh Haiku subagent. Use whenever a PR is opened, its body is updated, or its story changes after a push.
+description: Write or rebuild a PR body that lowers the reviewer's load (AGENTS.md rule 18). It leads with how the system works differently, in domain words, then gives the reviewer what the diff cannot: the decisions made with their ADRs, where to look first, the rollout risk and what nobody verified. Three shapes: model change, behaviour addition, bundle of fixes. Ends with a cold-read check by a fresh Haiku subagent. Use whenever a PR is opened, its body is updated, or its story changes after a push.
 ---
 
 # PR description (AGENTS.md rule 18)
@@ -38,23 +38,24 @@ Omit any section that has nothing to say. Worked examples, one per kind, are in 
 ## 2. Model change
 
 1. **Opening:** one to three sentences on what the system does differently and why.
-2. **New terms:** one line each, linked to the glossary. Every term used later in the body is defined here or in the glossary. Then one line linking the ADRs behind the PR ("Decisions: ADR-0012, ADR-0013"); the ADRs hold the why and the rejected alternatives, so the body doesn't repeat them.
-3. **The rule table,** the spine of the body:
+2. **New terms:** one line each, linked to the glossary. Every term used later in the body is defined here or in the glossary.
+3. **Decisions made:** a numbered list, one line per decision: the decision in a few words and the ADR it links to, nothing else ("1. Shipped means carrier-accepted ([ADR-0013](…))"). No why, cost, rejected alternative or decider. Write "no ADR" when there is none. The ADRs hold the why, the cost and the rejected alternatives, so the body never repeats them.
+4. **The rule table,** the spine of the body:
 
    | Rule | Before | After |
    |---|---|---|
 
    Domain words only. No file names in the table and no file-by-file list under it: "Look first" is the only place that ties rows to code.
-4. **Diagrams:** one Mermaid map of the concepts (entities, ownership, lifecycles, who may move what). A further diagram zooms into one node of the map and must show something the table cannot.
-5. **What changes for people:** users, operators and API consumers, including what is newly refused and any cost a decision accepted (for example "existing duplicates stay").
-6. **For the reviewer:**
+5. **Diagrams:** one Mermaid map of the concepts (entities, ownership, lifecycles, who may move what). A further diagram zooms into one node of the map and must show something the table cannot.
+6. **What changes for people:** users, operators and API consumers, including what is newly refused and any cost a decision accepted (for example "existing duplicates stay").
+7. **For the reviewer:**
    - **Look first:** 3 to 5 entry points. Each is a link to the file at the PR's head (`https://github.com/<repo>/blob/<head sha>/<path>`), the table rows it enforces, and the spec that proves them.
    - **Risk and rollout:** migration, deploy order, what breaks if done wrong. A single PR keeps its deploy gate here.
    - **Temporarily wrong until:** what this PR leaves incomplete on purpose, and which PR or manual step completes it.
    - **Not verified by anyone:** one line.
    - **Your call:** a question still open for the reviewer to decide, if any.
-7. **Stack and counterpart:** one line each. Where this PR sits, what it depends on, what ships with it, and a link to the stack's tracking issue (below).
-8. **Carried fixes** (rule 4): one line each, what it changes and why it rides here.
+8. **Stack and counterpart:** one line each. Where this PR sits, what it depends on, what ships with it, and a link to the stack's tracking issue (below).
+9. **Carried fixes** (rule 4): one line each, what it changes and why it rides here.
 
 ## 3. Behaviour addition
 

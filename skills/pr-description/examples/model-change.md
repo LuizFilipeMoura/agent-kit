@@ -6,7 +6,11 @@ Until now an order *was* its shipment: its status was recomputed from every parc
 - **The gate:** the one service that may change an order's status.
 - **Carrier-accepted:** the carrier has the parcel's manifest with no validation errors.
 
-Decisions: [ADR-0012](docs/adr/0012-fulfilments.md) (every parcel belongs to a fulfilment), [ADR-0013](docs/adr/0013-shipped-means-accepted.md) (Shipped means carrier-accepted).
+## Decisions made
+
+1. Every parcel belongs to a fulfilment ([ADR-0012](docs/adr/0012-fulfilments.md))
+2. Shipped means carrier-accepted ([ADR-0013](docs/adr/0013-shipped-means-accepted.md))
+3. Existing duplicate orders are not merged (no ADR)
 
 ## How the system works now
 

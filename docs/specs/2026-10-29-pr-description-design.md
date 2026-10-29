@@ -57,7 +57,8 @@ The agent picks the kind first. Omit any section that has nothing to say.
 **Model change** (the system's rules or ownership change):
 
 1. Opening: one to three sentences on what the system does differently and why.
-2. New terms: one line each, linked to the glossary. Then one line linking the ADRs behind the PR. (A "Decisions you might push back on" section was tried on the pilot and dropped: it repeated the rule table, the risk notes and the ADRs, and "decided by" was always the same person.)
+2. New terms: one line each, linked to the glossary.
+   Decisions made: a numbered list, one line per decision, the decision in a few words and its ADR link, nothing else: no why, cost, rejected alternative or decider ("no ADR" when there is none). (A "Decisions you might push back on" section with why, cost, rejected and decided by was tried on the pilot and dropped: it repeated the rule table, the risk notes and the ADRs, and "decided by" was always the same person.)
 3. **The rule table,** the spine of the body:
 
    | Rule | Before | After |
