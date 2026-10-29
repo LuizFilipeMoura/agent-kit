@@ -108,7 +108,8 @@ Before opening the PR or saving a rebuilt body, a fresh subagent on a cheap mode
 1. restate in three sentences how the system works differently;
 2. list the decisions a reviewer might reject;
 3. name the riskiest place to look;
-4. say what was not verified.
+4. say what was not verified;
+5. quote every sentence about how the branch or PR came to be (earlier PRs it replaces, rebuilds, "unchanged", "earlier design"). Each one is moved to the history comment.
 
 If any answer misses or contradicts the author's intent, rewrite and run it again. The result is reported in chat, not in the body. This is a skill step, not a hook: length and content stay guidance, and the cold read is the check that the guidance worked.
 
