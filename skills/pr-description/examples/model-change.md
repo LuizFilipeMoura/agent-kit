@@ -6,6 +6,8 @@ Until now an order *was* its shipment: its status was recomputed from every parc
 - **The gate:** the one service that may change an order's status.
 - **Carrier-accepted:** the carrier has the parcel's manifest with no validation errors.
 
+Decisions: [ADR-0012](docs/adr/0012-fulfilments.md) (every parcel belongs to a fulfilment), [ADR-0013](docs/adr/0013-shipped-means-accepted.md) (Shipped means carrier-accepted).
+
 ## How the system works now
 
 ```mermaid
@@ -30,28 +32,10 @@ flowchart LR
 | When an order is Shipped | when the label is printed | only once the carrier accepts the manifest |
 | Two writers on one manifest | the second overwrote the first | re-read, merge, retry up to 3 times |
 
-## Decisions you might push back on
-
-1. **Every parcel belongs to a fulfilment.**
-   - Why: one code path for status instead of two.
-   - Cost: a migration and a deploy gate; old pods must stop before new ones serve.
-   - Rejected: supporting parcels with and without a fulfilment.
-   - Decided by: tech lead, [ADR-0012](docs/adr/0012-fulfilments.md).
-2. **Shipped means carrier-accepted.**
-   - Why: support kept answering "Shipped" tickets for parcels the carrier refused.
-   - Cost: an order stays Packed until the carrier answers, which can take minutes.
-   - Rejected: a separate "Submitted to carrier" status.
-   - Decided by: `@ops-lead`, [ADR-0013](docs/adr/0013-shipped-means-accepted.md).
-3. **Existing duplicate orders stay as they are.**
-   - Why: merging them would guess which payment to keep.
-   - Cost: about 40 known duplicates still show twice in reports.
-   - Rejected: merging duplicates in the migration.
-   - Decided by: agent, not confirmed.
-
 ## What changes for people
 
-- **Staff** re-send an order from the order page; it starts a new fulfilment instead of a new order.
-- **Customers** see Shipped only once the carrier accepts.
+- **Staff** re-send an order from the order page; it starts a new fulfilment instead of a new order. The about 40 duplicate orders that already exist stay as they are.
+- **Customers** see Shipped only once the carrier accepts, which can take minutes after the label prints.
 - **API:** `POST /orders/:id/fulfilments` is new. `POST /orders/:id/resend` is removed (0 calls in 30 days).
 
 ## For the reviewer

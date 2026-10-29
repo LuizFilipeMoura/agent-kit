@@ -1,6 +1,6 @@
 ---
 name: pr-description
-description: Write or rebuild a PR body that lowers the reviewer's load (AGENTS.md rule 18). It leads with how the system works differently, in domain words, then gives the reviewer what the diff cannot: the decisions worth challenging, where to look first, the rollout risk and what nobody verified. Three shapes: model change, behaviour addition, bundle of fixes. Ends with a cold-read check by a fresh Haiku subagent. Use whenever a PR is opened, its body is updated, or its story changes after a push.
+description: Write or rebuild a PR body that lowers the reviewer's load (AGENTS.md rule 18). It leads with how the system works differently, in domain words, then gives the reviewer what the diff cannot: the ADRs behind it, where to look first, the rollout risk and what nobody verified. Three shapes: model change, behaviour addition, bundle of fixes. Ends with a cold-read check by a fresh Haiku subagent. Use whenever a PR is opened, its body is updated, or its story changes after a push.
 ---
 
 # PR description (AGENTS.md rule 18)
@@ -9,7 +9,7 @@ The reader is a developer reviewer who knows the codebase, not this change. With
 
 1. **Agree with the idea:** see how the system works differently, in domain words.
 2. **Check the code does it:** jump from each claim to the code that enforces it and the test that proves it.
-3. **Judge whether it is safe to ship:** see the decisions worth challenging, the rollout risk, and what nobody verified.
+3. **Judge whether it is safe to ship:** see the rollout risk, the costs accepted, and what nobody verified.
 
 ## Sources
 
@@ -38,7 +38,7 @@ Omit any section that has nothing to say. Worked examples, one per kind, are in 
 ## 2. Model change
 
 1. **Opening:** one to three sentences on what the system does differently and why.
-2. **New terms:** one line each, linked to the glossary. Every term used later in the body is defined here or in the glossary.
+2. **New terms:** one line each, linked to the glossary. Every term used later in the body is defined here or in the glossary. Then one line linking the ADRs behind the PR ("Decisions: ADR-0012, ADR-0013"); the ADRs hold the why and the rejected alternatives, so the body doesn't repeat them.
 3. **The rule table,** the spine of the body:
 
    | Rule | Before | After |
@@ -46,22 +46,15 @@ Omit any section that has nothing to say. Worked examples, one per kind, are in 
 
    Domain words only. No file names in the table and no file-by-file list under it: "Look first" is the only place that ties rows to code.
 4. **Diagrams:** one Mermaid map of the concepts (entities, ownership, lifecycles, who may move what). A further diagram zooms into one node of the map and must show something the table cannot.
-5. **Decisions you might push back on:** at most 5, each with all five parts:
-   - **Title:** the decision stated positively ("Every order has one fulfilment", not "No fallback").
-   - **Why:** one line.
-   - **Cost:** what the reviewer accepts by agreeing.
-   - **Rejected:** the alternatives.
-   - **Decided by:** a role or a `@handle` in backticks (backticks stop the ping), plus the ADR link if there is one. Write "agent, not confirmed" when nobody confirmed it: those are the ones to look at hardest. Never "user decision".
-
-   An item with no real cost or no rejected alternative is not a decision to push back on: move it to "What changes for people" or drop it.
-6. **What changes for people:** users, operators and API consumers, including what is newly refused.
-7. **For the reviewer:**
+5. **What changes for people:** users, operators and API consumers, including what is newly refused and any cost a decision accepted (for example "existing duplicates stay").
+6. **For the reviewer:**
    - **Look first:** 3 to 5 entry points. Each is a link to the file at the PR's head (`https://github.com/<repo>/blob/<head sha>/<path>`), the table rows it enforces, and the spec that proves them.
    - **Risk and rollout:** migration, deploy order, what breaks if done wrong. A single PR keeps its deploy gate here.
    - **Temporarily wrong until:** what this PR leaves incomplete on purpose, and which PR or manual step completes it.
    - **Not verified by anyone:** one line.
-8. **Stack and counterpart:** one line each. Where this PR sits, what it depends on, what ships with it, and a link to the stack's tracking issue (below).
-9. **Carried fixes** (rule 4): one line each, what it changes and why it rides here.
+   - **Your call:** a question still open for the reviewer to decide, if any.
+7. **Stack and counterpart:** one line each. Where this PR sits, what it depends on, what ships with it, and a link to the stack's tracking issue (below).
+8. **Carried fixes** (rule 4): one line each, what it changes and why it rides here.
 
 ## 3. Behaviour addition
 
@@ -107,7 +100,7 @@ Before opening the PR or saving a rebuilt body, run a fresh `general-purpose` su
 
 > You are a developer reviewer who knows the codebase but not this change. Using only the PR body and diff stat below, answer:
 > 1. In three sentences, how does the system work differently after this PR?
-> 2. Which decisions might a reviewer reject?
+> 2. What cost or behaviour change might a reviewer object to?
 > 3. Where is the riskiest place to look?
 > 4. What was not verified?
 > 5. Quote every sentence about how the branch or PR came to be (earlier PRs, rebuilds, "unchanged", earlier designs). The stack line and carried fixes are not history.
@@ -117,6 +110,10 @@ Compare the answers with your intent. If any answer misses or contradicts it, mo
 
 Report the result in chat, never in the body.
 
-## 9. Save
+## 9. Feedback changes the skill first
+
+When the user corrects a PR body (a section to drop, a shape to change, a word to avoid), change this skill, its examples and the spec in `docs/specs/` in the same turn, push the kit, then rebuild the PR from the updated skill. A correction applied only to one PR is lost on the next one.
+
+## 10. Save
 
 `gh pr create --body-file <file>` or `gh pr edit <n> --body-file <file>`. End the body with the attribution line the session gives you.

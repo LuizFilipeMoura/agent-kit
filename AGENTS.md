@@ -120,4 +120,4 @@ Before saying a change is done, run the narrowest check that proves it (the spec
 
 ### 18. PR descriptions lower the reviewer's load
 
-Every PR body follows the `pr-description` skill: it leads with how the system works differently, in the project's domain words, and gives the reviewer what the diff cannot (decisions worth challenging, where to look first, rollout risk, what nobody verified). Rebuild the body from scratch on every update; never append. Branch history goes in a PR comment, not the body. Before saving a body, a fresh Haiku subagent must read it cold and restate it correctly.
+Every PR body follows the `pr-description` skill: it leads with how the system works differently, in the project's domain words, and gives the reviewer what the diff cannot (the ADRs behind it, where to look first, rollout risk, what nobody verified). Rebuild the body from scratch on every update; never append. Branch history goes in a PR comment, not the body. Before saving a body, a fresh Haiku subagent must read it cold and restate it correctly.

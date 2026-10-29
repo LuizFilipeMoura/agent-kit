@@ -34,7 +34,7 @@ A reviewer who opens the PR can, with the least effort:
 
 1. **Agree with the idea:** see how the system works differently, in domain words.
 2. **Check the code does it:** jump from each claim to the code that enforces it and the test that proves it.
-3. **Judge whether it is safe to ship:** see the decisions worth challenging, the rollout risk, and what nobody verified.
+3. **Judge whether it is safe to ship:** see the rollout risk, the costs accepted, and what nobody verified.
 
 The reader is a developer reviewer: knows the codebase, not this change.
 
@@ -57,7 +57,7 @@ The agent picks the kind first. Omit any section that has nothing to say.
 **Model change** (the system's rules or ownership change):
 
 1. Opening: one to three sentences on what the system does differently and why.
-2. New terms: one line each, linked to the glossary.
+2. New terms: one line each, linked to the glossary. Then one line linking the ADRs behind the PR. (A "Decisions you might push back on" section was tried on the pilot and dropped: it repeated the rule table, the risk notes and the ADRs, and "decided by" was always the same person.)
 3. **The rule table,** the spine of the body:
 
    | Rule | Before | After |
@@ -66,21 +66,13 @@ The agent picks the kind first. Omit any section that has nothing to say.
 
    The table and the prose use domain words only. No file names here and no file-by-file list under it: "Look first" is the only place that ties rows to code.
 4. Diagrams: one map diagram of the concepts (entities, ownership, lifecycles, who may move what). Any further diagram zooms into one node of the map and must show something the table cannot. No cap, but every diagram has to pass that test.
-5. Decisions you might push back on: at most 5. Each has all five parts:
-   - **Title:** the decision stated positively ("Every interview belongs to a service", not "No fallback").
-   - **Why:** one line.
-   - **Cost:** what the reviewer accepts by agreeing.
-   - **Rejected:** the alternatives.
-   - **Decided by:** a role or a `@handle` in backticks (no ping), plus the ADR link if there is one. "Agent, not confirmed" when nobody confirmed it. Never "user decision".
-
-   An item with no real cost or no rejected alternative is not a push-back decision: move it to "What changes for people" or drop it. Every term a decision uses is defined in New terms.
-6. What changes for people: user, operator and API-consumer behaviour, including what is newly refused.
-7. For the reviewer:
+5. What changes for people: user, operator and API-consumer behaviour, including what is newly refused and any cost a decision accepted.
+6. For the reviewer:
    - **Look first:** 3 to 5 entry points, each a link to the file at the PR's head, the table rows it enforces, and the spec that proves them.
    - **Risk and rollout:** migration, deploy order, what breaks if done wrong.
    - **Temporarily wrong until:** anything this PR leaves incomplete on purpose, and which PR completes it.
    - **Not verified by anyone:** one line.
-8. Stack position and counterpart PR: one line each, linking to the stack's home (section 5).
+7. Stack position and counterpart PR: one line each, linking to the stack's home (section 5).
 
 Target: about 800 to 1,000 words plus diagrams for the largest changes.
 
@@ -112,7 +104,7 @@ After a push that changes what the PR does (a rebuild, a dropped piece, a new de
 Before opening the PR or saving a rebuilt body, a fresh Haiku subagent gets only the body and `git diff --stat`. It must:
 
 1. restate in three sentences how the system works differently;
-2. list the decisions a reviewer might reject;
+2. list the costs or behaviour changes a reviewer might object to;
 3. name the riskiest place to look;
 4. say what was not verified;
 5. quote every sentence about how the branch or PR came to be (earlier PRs it replaces, rebuilds, "unchanged", "earlier design"). Each one is moved to the history comment.
