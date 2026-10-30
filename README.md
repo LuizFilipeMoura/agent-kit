@@ -38,7 +38,6 @@ In PowerShell, write `$HOME/agent-kit` instead of `~/agent-kit`. Restart any ope
 | `hooks/guard.js` | Enforces rules 3, 10 and 16 everywhere, and rules 5 and 9 where a project turns them on. Tests: `node --test ~/agent-kit/hooks/guard.test.js` |
 | `hooks/pull.js` | The session-start update described above |
 | `tools/diagrams/` | `lib.js` (inline-SVG boxes, edges, sequences), `page.js` (page shell), `serve.js` (static server on 127.0.0.1:8799) |
-| `tools/pr-maps/teardown.js` | Removes the PR file maps published before rule 15 was retired; run from the workspace folder, `--dry-run` first |
 | `tools/jest-procs.js` | List Jest processes; `--kill-orphans` kills the ones whose parent is gone |
 | `setup.js` | One-time setup per PC |
 

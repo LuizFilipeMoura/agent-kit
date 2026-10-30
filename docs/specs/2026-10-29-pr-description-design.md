@@ -134,7 +134,7 @@ If any answer misses or contradicts the author's intent, rewrite and run it agai
 - `skills/pr-workflow`: step 3 says "write the body with `pr-description`"; step 5 (file map) is removed; step 6 drops the map link; "After a lower PR changes" drops "rebuild their file maps".
 - `hooks/guard.js`: the reminder after a PR is opened no longer mentions the file map. The reminder after a push becomes "if the PR's story changed, rebuild its body with `pr-description` and post a history comment; rebase the PRs stacked above it". `guard.test.js` follows.
 - `AGENTS.md` "At a glance" and the hooks paragraph drop rule 15 and add rule 18. README rows follow.
-- `tools/pr-maps/` stays only for `teardown.js`, to remove maps already published, then goes in a later change.
+- `tools/pr-maps/` stayed only for `teardown.js`, which removed every published map on 2026-10-30; then it was deleted too.
 
 ### 11. Project overlays
 
@@ -148,7 +148,7 @@ Project `AGENTS.md` overlays add only their specifics:
 
 - The skill holds three worked examples, one per PR kind, with invented names (the kit is public).
 - A pilot PR is written with the skill, passes the cold-read check, and the user approves its body before it goes live.
-- After the change, no kit file mentions file maps except the retired rule 15 line and `tools/pr-maps/teardown.js`.
+- After the change, no kit file mentions file maps except the retired rule 15 line.
 - `node --test hooks/guard.test.js` passes.
 
 ## Out of scope
